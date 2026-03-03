@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Icon from './Icon'
 import Image from 'next/image'
+import MobileMenu from "./Burger";
 
 export default function Header() {
   return (
@@ -82,7 +83,7 @@ export default function Header() {
             >
               Sign In
             </Link>
-
+            <MobileMenu />
           </div>
         </div>
       </div>
