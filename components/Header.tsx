@@ -1,58 +1,89 @@
 import Link from 'next/link'
+import Icon from './Icon'
+import Image from 'next/image'
 
 export default function Header() {
   return (
-    <header className="bg-white shadow">
+    <header className="bg-amber-50 border-b border-amber-100 sticky top-0 z-50 shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          
+        <div className="flex h-16 items-center justify-between gap-6">
+
           {/* Logo */}
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="Cocoir-Mart" className="h-8 w-8" />
-              <span className="font-semibold text-lg">Cocoir-Mart</span>
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-800 to-amber-700 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+              <Image 
+                src="/Logo.jpg" 
+                alt="Cocoir-Mart" 
+                width={50} 
+                height={50} 
+              />
+            </div>
+            <span
+              className="font-bold text-lg text-stone-800 tracking-tight"
+              style={{ fontFamily: "'Georgia', serif" }}
+            >
+              Cocoir-Mart
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:gap-6">
-            <nav className="flex items-center gap-4 text-sm text-gray-700">
-              <Link href="/" className="hover:text-gray-900">Home</Link>
-              <Link href="/products" className="hover:text-gray-900">Products</Link>
-              <Link href="/orders" className="hover:text-gray-900">Orders</Link>
-              <Link href="/seller" className="hover:text-gray-900">Seller</Link>
-            </nav>
-
-            {/* Search + Cart */}
-            <div className="flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-stone-600">
+            {[
+              { href: '/',         label: 'Home' },
+              { href: '/products', label: 'Products' },
+              { href: '/orders',   label: 'Orders' },
+              { href: '/seller',   label: 'Seller' },
+            ].map(({ href, label }) => (
               <Link
-                href="/cart"
-                className="relative inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
+                key={href}
+                href={href}
+                className="px-3 py-1.5 rounded-lg hover:bg-amber-100 hover:text-stone-900 transition-colors duration-150"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4"
-                  />
-                </svg>
-                <span className="sr-only">View cart</span>
+                {label}
               </Link>
+            ))}
+          </nav>
 
-              <div>
-                
-              </div>
-            </div>
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className="relative flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 text-stone-600 hover:text-stone-900 transition-colors duration-150"
+              aria-label="View cart"
+            >
+              <Icon src="/cart.svg" 
+                alt="Cart" 
+                width={25} 
+                height={25} />
+              {/* Cart badge */}
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                2
+              </span>
+            </Link>
+
+            {/* Divider */}
+            <div className="w-px h-5 bg-stone-200 mx-1" />
+
+            {/* Register / Profile icon */}
+            <Link
+              href="/auth/register"
+              className="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 transition-colors duration-150"
+              aria-label="Register"
+            >
+              <Icon src="/register.svg" alt="Register" width={22} height={22} />
+            </Link>
+
+            {/* Login button */}
+            <Link
+              href="/auth/login"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-amber-50 text-sm font-medium rounded-xl transition-colors duration-150 shadow-sm"
+            >
+              Sign In
+            </Link>
+
           </div>
-
         </div>
       </div>
     </header>
