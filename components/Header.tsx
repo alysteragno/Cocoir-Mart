@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function Header() {
   return (
-    <header className="bg-white border-b">
+    <header className="bg-white shadow">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           
@@ -26,14 +26,6 @@ export default function Header() {
 
             {/* Search + Cart */}
             <div className="flex items-center gap-4">
-              <label className="relative hidden sm:block">
-                <input
-                  type="search"
-                  placeholder="Search products"
-                  className="w-64 rounded-md border px-3 py-1 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </label>
-
               <Link
                 href="/cart"
                 className="relative inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
@@ -53,8 +45,11 @@ export default function Header() {
                   />
                 </svg>
                 <span className="sr-only">View cart</span>
-                <span className="hidden sm:inline">Cart</span>
               </Link>
+
+              <div>
+                
+              </div>
             </div>
           </div>
 
