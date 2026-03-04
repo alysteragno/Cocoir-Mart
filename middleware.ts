@@ -1,10 +1,66 @@
-import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export function middleware(_req: NextRequest) {
-  // TODO: Add real role-based checks using Supabase auth helpers or JWT.
-  // For now, this file exists to show where you'd protect /seller routes.
+export async function middleware(request: NextRequest) {
+  const response = NextResponse.next()
+  const { pathname } = request.nextUrl
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // ── Protect /admin routes ──
+  if (pathname.startsWith('/admin')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      // Logged in but not admin — send to home
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
+  // ── Protect customer-only routes ──
+  if (
+    pathname.startsWith('/orders') ||
+    pathname.startsWith('/cart') ||
+    pathname.startsWith('/checkout') ||
+    pathname.startsWith('/profile')
+  ) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+  }
+
+  return response
 }
 
 export const config = {
-  matcher: ['/seller/:path*']
+  matcher: [
+    '/admin/:path*',
+    '/orders/:path*',
+    '/cart/:path*',
+    '/checkout/:path*',
+    '/profile/:path*',
+  ],
 }
