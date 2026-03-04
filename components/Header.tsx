@@ -33,7 +33,6 @@ export default function Header() {
               { href: '/',         label: 'Home' },
               { href: '/products', label: 'Products' },
               { href: '/orders',   label: 'Orders' },
-              { href: '/seller',   label: 'Seller' },
             ].map(({ href, label }) => (
               <Link
                 key={href}
