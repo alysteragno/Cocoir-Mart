@@ -18,9 +18,9 @@ export default function LoginPage() {
 
     const supabase = supabaseBrowser()
 
-    // Step 1: check if email exists in profiles
+    // Step 1: check if email exists in users table
     const { data: existingUser } = await supabase
-      .from('profiles')
+      .from('users')
       .select('id')
       .eq('email', email)
       .single()

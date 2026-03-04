@@ -84,7 +84,19 @@ function SectionDivider({ label }: { label: string }) {
   )
 }
 
-
+function getFriendlyError(message: string): string {
+  const msg = message.toLowerCase()
+  if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('duplicate')) {
+    return 'An account with this email already exists. Sign in instead.'
+  }
+  if (msg.includes('password')) {
+    return 'Password must be at least 8 characters.'
+  }
+  if (msg.includes('invalid email')) {
+    return 'Please enter a valid email address.'
+  }
+  return message
+}
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -94,10 +106,7 @@ export default function RegisterPage() {
     address: '',
     password: '', confirmPassword: '',
     agree: false,
-    
   })
-
-  
   const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -126,27 +135,47 @@ export default function RegisterPage() {
     setErrors(errs)
     if (Object.keys(errs).length > 0) return
     setLoading(true)
+
     const supabase = supabaseBrowser()
+
+    // Check if email already exists in users table
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', form.email)
+      .single()
+
+    if (existingUser) {
+      setGlobalError('An account with this email already exists. Sign in instead.')
+      setLoading(false)
+      return
+    }
+
+    // Create account
     const { error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
         data: {
-          first_name: form.firstName,  // ← must match trigger's 'first_name'
-          last_name: form.lastName,    // ← must match trigger's 'last_name'
+          first_name: form.firstName,
+          last_name: form.lastName,
           mobile: form.mobile,
           address: form.address,
         },
       },
     })
+
     if (error) {
-      setGlobalError(error.message)
+      console.log('Supabase signUp error:', error)
+      setGlobalError(getFriendlyError(error.message))
       setLoading(false)
-    } else {
-      setSuccess(true)
-      setLoading(false)
-      setTimeout(() => router.push('/login'), 2000)
+      return
     }
+
+    // Success
+    setSuccess(true)
+    setLoading(false)
+    setTimeout(() => router.push('/auth/login'), 3000)  // ← fixed route
   }
 
   const strength = getStrength(form.password)
@@ -155,8 +184,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-2xl">
-
-        {/* Card */}
         <div className="bg-white rounded-3xl border border-stone-200 shadow-xl shadow-stone-900/8 px-8 py-10">
 
           {/* Header */}
@@ -176,7 +203,16 @@ export default function RegisterPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm text-red-600">{globalError}</p>
+              <div className="text-sm text-red-600">
+                <p>{globalError}</p>
+                {globalError.includes('already exists') && (
+                  <p className="mt-1.5">
+                    <Link href="/auth/login" className="font-semibold underline hover:text-red-700">
+                      Sign in instead →
+                    </Link>
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
@@ -195,7 +231,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
 
-            {/* ── PERSONAL INFO ── */}
+            {/* PERSONAL INFO */}
             <div>
               <SectionDivider label="Personal Information" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -230,7 +266,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* ── ACCOUNT SECURITY ── */}
+            {/* ACCOUNT SECURITY */}
             <div>
               <SectionDivider label="Account Security" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -259,7 +295,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* ── TERMS ── */}
+            {/* TERMS */}
             <div>
               <label className="flex items-start gap-3 cursor-pointer">
                 <input type="checkbox" checked={form.agree}
@@ -276,7 +312,7 @@ export default function RegisterPage() {
               {errors.agree && <p className="mt-1.5 text-xs text-red-500 ml-7">{errors.agree}</p>}
             </div>
 
-            {/* ── SUBMIT ── */}
+            {/* SUBMIT */}
             <button
               type="submit"
               disabled={loading || success}
@@ -297,14 +333,12 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-6 text-xs text-stone-400">
             <div className="flex-1 h-px bg-stone-100" />
             or
             <div className="flex-1 h-px bg-stone-100" />
           </div>
 
-          {/* Login link */}
           <p className="text-center text-sm text-stone-500">
             Already have an account?{' '}
             <Link href="/auth/login" className="text-amber-700 font-semibold hover:underline">
@@ -312,7 +346,6 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
-
       </div>
     </div>
   )
