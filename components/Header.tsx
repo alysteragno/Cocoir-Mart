@@ -68,17 +68,22 @@ export default function Header() {
             <div className="w-px h-5 bg-stone-200 mx-1" />
 
             {/* Register / Profile icon */}
-            <Link
-              href="/auth/register"
-              className="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 transition-colors duration-150"
-              aria-label="Register"
-            >
-              <Icon src="/register.svg" alt="Register" width={22} height={22} />
-            </Link>
+           <Link
+  href="/login"
+  className="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 transition-colors duration-150"
+  aria-label="Login"
+>
+  <Icon 
+    src="/register.svg" 
+    alt="Register" 
+    width={22} 
+    height={22} 
+  />
+</Link>
 
             {/* Login button */}
             <Link
-              href="/auth/login"
+              href="/auth/register"
               className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-amber-50 text-sm font-medium rounded-xl transition-colors duration-150 shadow-sm"
             >
               Sign In
