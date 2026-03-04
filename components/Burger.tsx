@@ -7,7 +7,6 @@ const navLinks = [
   { href: "/",         label: "Home" },
   { href: "/products", label: "Products" },
   { href: "/orders",   label: "Orders" },
-  { href: "/seller",   label: "Seller" },
 ];
 
 export default function MobileMenu() {
