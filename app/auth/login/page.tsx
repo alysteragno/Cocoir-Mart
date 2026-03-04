@@ -19,11 +19,12 @@ export default function LoginPage() {
     const supabase = supabaseBrowser()
 
     // Step 1: check if email exists in users table
+   // In LoginPage and RegisterPage — already correct:
     const { data: existingUser } = await supabase
       .from('users')
-      .select('id')
+      .select('id')       // ← only id, not personal data
       .eq('email', email)
-      .single()
+      .maybeSingle()
 
     if (!existingUser) {
       setError('Account does not exist. Please register to create an account.')
