@@ -39,11 +39,18 @@ export default function LoginPage() {
       return
     }
 
-    // Step 3: fetch role
+    // Step 3: wait for session then fetch role from users table
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      setError('Could not establish session. Please try again.')
+      setLoading(false)
+      return
+    }
+
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+      .from('users')           // ← was 'profiles', now 'users'
       .select('role')
-      .eq('id', data.user.id)
+      .eq('id', session.user.id)
       .single()
 
     if (profileError || !profile) {
@@ -84,6 +91,13 @@ export default function LoginPage() {
               </svg>
               <div className="text-sm text-red-600">
                 <p>{error}</p>
+                {error.includes('does not exist') && (
+                  <p className="mt-1.5">
+                    <Link href="/auth/register" className="font-semibold underline hover:text-red-700">
+                      Create an account →
+                    </Link>
+                  </p>
+                )}
               </div>
             </div>
           )}
