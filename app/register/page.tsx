@@ -84,6 +84,8 @@ function SectionDivider({ label }: { label: string }) {
   )
 }
 
+
+
 export default function RegisterPage() {
   const router = useRouter()
   const [form, setForm] = useState<FormState>({
@@ -92,7 +94,10 @@ export default function RegisterPage() {
     address: '',
     password: '', confirmPassword: '',
     agree: false,
+    
   })
+
+  
   const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -127,7 +132,8 @@ export default function RegisterPage() {
       password: form.password,
       options: {
         data: {
-          full_name: `${form.firstName} ${form.lastName}`,
+          first_name: form.firstName,  // ← must match trigger's 'first_name'
+          last_name: form.lastName,    // ← must match trigger's 'last_name'
           mobile: form.mobile,
           address: form.address,
         },
