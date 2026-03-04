@@ -83,10 +83,10 @@ export default function Header() {
 
             {/* Login button */}
             <Link
-              href="/register"
+              href="/auth/register"
               className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-amber-50 text-sm font-medium rounded-xl transition-colors duration-150 shadow-sm"
             >
-              Sign In
+              Register
             </Link>
             <MobileMenu />
           </div>
