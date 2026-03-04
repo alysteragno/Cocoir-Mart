@@ -68,7 +68,7 @@ export default function Header() {
 
             {/* Register / Profile icon */}
            <Link
-  href="/login"
+  href="/auth/login"
   className="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 transition-colors duration-150"
   aria-label="Login"
 >
