@@ -18,15 +18,28 @@ export default function LoginPage() {
 
     const supabase = supabaseBrowser()
 
-    // Step 1: sign in
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) {
-      setError(signInError.message)
+    // Step 1: check if email exists in profiles
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .single()
+
+    if (!existingUser) {
+      setError('Account does not exist. Please register to create an account.')
       setLoading(false)
       return
     }
 
-    // Step 2: fetch role from profiles
+    // Step 2: attempt sign in
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) {
+      setError('Invalid credentials. Please try again.')
+      setLoading(false)
+      return
+    }
+
+    // Step 3: fetch role
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
@@ -39,9 +52,9 @@ export default function LoginPage() {
       return
     }
 
-    // Step 3: redirect based on role
+    // Step 4: redirect based on role
     if (profile.role === 'admin') {
-      router.push('/seller/dashboard')
+      router.push('/admin/dashboard')
     } else {
       router.push('/')
     }
@@ -69,7 +82,9 @@ export default function LoginPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm text-red-600">{error}</p>
+              <div className="text-sm text-red-600">
+                <p>{error}</p>
+              </div>
             </div>
           )}
 
