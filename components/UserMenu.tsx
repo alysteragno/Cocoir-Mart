@@ -9,25 +9,14 @@ export default function UserMenu() {
   const router = useRouter()
   const [user, setUser] = useState<{ firstName: string; email: string } | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
     const supabase = supabaseBrowser()
 
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const meta = session.user.user_metadata
-        const email = session.user.email ?? ''
-        const firstName = meta?.first_name || email.split('@')[0]
-        setUser({ firstName, email })
-      }
-    }
-
-    getUser()
-
+    // onAuthStateChange fires immediately with current session
+    // so no need for a separate getSession call
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         const meta = session.user.user_metadata
@@ -37,12 +26,12 @@ export default function UserMenu() {
       } else {
         setUser(null)
       }
+      setMounted(true)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  // Animate in on open
   useEffect(() => {
     if (dropdownOpen) {
       requestAnimationFrame(() => setVisible(true))
@@ -65,7 +54,10 @@ export default function UserMenu() {
     setTimeout(() => setDropdownOpen(false), 150)
   }
 
-  if (!mounted) return null
+  // Don't render anything until auth state is known
+  if (!mounted) return (
+    <div className="w-9 h-9 rounded-xl bg-amber-100 animate-pulse" />
+  )
 
   if (!user) {
     return (
@@ -130,10 +122,7 @@ export default function UserMenu() {
 
       {dropdownOpen && (
         <>
-          {/* Backdrop */}
           <div className="fixed inset-0 z-40" onClick={closeDropdown} />
-
-          {/* Dropdown */}
           <div
             className="absolute right-0 top-12 w-52 bg-white rounded-2xl border border-stone-100 shadow-xl shadow-stone-900/10 py-2 z-50 overflow-hidden"
             style={{
@@ -143,13 +132,11 @@ export default function UserMenu() {
               transformOrigin: 'top right',
             }}
           >
-            {/* User info */}
             <div className="px-4 py-2.5 border-b border-stone-100">
               <p className="text-sm font-semibold text-stone-800">{user.firstName}</p>
               <p className="text-xs text-stone-400 truncate">{user.email}</p>
             </div>
 
-            {/* Menu items with staggered animation */}
             {menuItems.map(({ href, label, icon }, i) => (
               <Link
                 key={href}
@@ -167,13 +154,12 @@ export default function UserMenu() {
               </Link>
             ))}
 
-            {/* Sign out */}
             <div
               className="border-t border-stone-100 mt-1 pt-1"
               style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? 'translateX(0)' : 'translateX(-6px)',
-                transition: `opacity 200ms ease 160ms, transform 200ms ease 160ms`,
+                transition: 'opacity 200ms ease 160ms, transform 200ms ease 160ms',
               }}
             >
               <button
