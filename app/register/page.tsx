@@ -145,7 +145,7 @@ export default function RegisterPage() {
     } else {
       setSuccess(true)
       setLoading(false)
-      setTimeout(() => router.push('/auth/login'), 2000)
+      setTimeout(() => router.push('/login'), 2000)
     }
   }
 
@@ -200,12 +200,12 @@ export default function RegisterPage() {
               <SectionDivider label="Personal Information" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="First Name" id="firstName" error={errors.firstName}>
-                  <input id="firstName" type="text" placeholder="Maria"
+                  <input id="firstName" type="text" placeholder="First Name"
                     value={form.firstName} onChange={e => set('firstName', e.target.value)}
                     className={inputCls(errors.firstName)} />
                 </Field>
                 <Field label="Last Name" id="lastName" error={errors.lastName}>
-                  <input id="lastName" type="text" placeholder="Santos"
+                  <input id="lastName" type="text" placeholder="Last Name"
                     value={form.lastName} onChange={e => set('lastName', e.target.value)}
                     className={inputCls(errors.lastName)} />
                 </Field>
