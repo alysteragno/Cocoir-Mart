@@ -41,6 +41,20 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  if (pathname === "/") {
+  if (user) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role === "admin") {
+      return NextResponse.redirect(new URL("/seller/dashboard", request.url));
+    }
+  }
+}
+
   if (pathname.startsWith("/cart") || pathname.startsWith("/checkout")) {
     if (user) {
       const { data: profile } = await supabase
@@ -68,10 +82,14 @@ export async function middleware(request: NextRequest) {
   }
 
   return response;
+
+  
 }
+
 
 export const config = {
   matcher: [
+    "/",
     "/seller/:path*",
     "/orders/:path*",
     "/cart/:path*",
