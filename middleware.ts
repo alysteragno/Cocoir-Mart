@@ -22,8 +22,8 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // ── Protect /admin routes ──
-  if (pathname.startsWith('/admin')) {
+  // ── Protect /seller routes ──
+  if (pathname.startsWith('/seller')) {
     if (!user) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
@@ -35,7 +35,6 @@ export async function middleware(request: NextRequest) {
       .single()
 
     if (!profile || profile.role !== 'admin') {
-      // Logged in but not admin — send to home
       return NextResponse.redirect(new URL('/', request.url))
     }
   }
@@ -57,7 +56,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/admin/:path*',
+    '/seller/:path*',
     '/orders/:path*',
     '/cart/:path*',
     '/checkout/:path*',
