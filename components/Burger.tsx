@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const navLinks = [
-  { href: "/",         label: "Home" },
+  { href: "/", label: "Home" },
   { href: "/products", label: "Products" },
-  { href: "/orders",   label: "Orders" },
+  { href: "/orders", label: "Orders" },
 ];
 
 export default function MobileMenu() {
@@ -23,14 +23,22 @@ export default function MobileMenu() {
         aria-expanded={menuOpen}
       >
         {menuOpen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         ) : (
-          <Image src="/Burger.svg" 
-            alt="Hamburger" 
-            width={25} 
-            height={25} />
+          <Image src="/Burger.svg" alt="Hamburger" width={25} height={25} />
         )}
       </button>
 
@@ -38,9 +46,10 @@ export default function MobileMenu() {
       <div
         className={`absolute top-16 left-0 right-0 border-t border-amber-100 bg-amber-50 px-4 pb-4 pt-2 space-y-1 shadow-md
           transition-all duration-300 ease-in-out origin-top
-          ${menuOpen
-            ? "opacity-100 scale-y-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 scale-y-95 -translate-y-2 pointer-events-none"
+          ${
+            menuOpen
+              ? "opacity-100 scale-y-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 scale-y-95 -translate-y-2 pointer-events-none"
           }`}
       >
         {navLinks.map(({ href, label }, i) => (
@@ -57,8 +66,6 @@ export default function MobileMenu() {
             {label}
           </Link>
         ))}
-
-       
       </div>
     </div>
   );
