@@ -1,4 +1,3 @@
-// app/(customer)/layout.tsx — customer layout WITH header and footer
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -13,3 +12,5 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     </div>
   )
 }
+```
+
