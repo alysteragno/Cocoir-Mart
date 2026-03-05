@@ -15,7 +15,7 @@ export default function MobileMenu() {
   return (
     <div className="md:hidden">
       {/* Hamburger Button */}
-      <button
+      <button 
         type="button"
         onClick={() => setMenuOpen((o) => !o)}
         className="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 text-stone-700 transition-colors duration-150"

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { supabaseBrowser } from '@/lib/supabaseClient'
+import Image from 'next/image'
 
 const navItems = [
   {
@@ -58,6 +59,7 @@ export default function SellerHeader() {
   const [adminName, setAdminName] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [dropdownVisible, setDropdownVisible] = useState(false)
 
   useEffect(() => {
     const supabase = supabaseBrowser()
@@ -69,27 +71,37 @@ export default function SellerHeader() {
     return () => subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    if (dropdownOpen) requestAnimationFrame(() => setDropdownVisible(true))
+    else setDropdownVisible(false)
+  }, [dropdownOpen])
+
   const handleLogout = async () => {
     const supabase = supabaseBrowser()
     await supabase.auth.signOut()
     router.push('/auth/login')
   }
 
+  const closeDropdown = () => {
+    setDropdownVisible(false)
+    setTimeout(() => setDropdownOpen(false), 150)
+  }
+
   return (
-    <header className="sticky top-0 z-50 bg-stone-900 border-b border-stone-800 shadow-xl shadow-stone-950/50">
+    <header className="sticky top-0 z-50 bg-amber-50 border-b border-amber-100 shadow-sm relative">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6">
-        <div className="flex h-14 items-center justify-between gap-4">
+        <div className="flex h-16 items-center justify-between gap-4">
 
           {/* Logo */}
           <Link href="/seller/dashboard" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-600 to-amber-400 flex items-center justify-center text-sm shadow-md group-hover:scale-105 transition-transform">
-              🥥
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-800 to-amber-700 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
+              <Image src="/Logo.jpg" alt="Cocoir-Mart" width={50} height={50} />
             </div>
-            <div className="hidden sm:block">
-              <span className="text-sm font-bold text-amber-50 tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-lg text-stone-800 tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
                 Cocoir-Mart
               </span>
-              <span className="ml-2 text-[9px] font-bold uppercase tracking-[3px] text-amber-600 bg-amber-600/10 border border-amber-600/20 px-1.5 py-0.5 rounded-full">
+              <span className="text-[9px] font-bold uppercase tracking-[3px] text-amber-700 bg-amber-100 border border-amber-200 px-1.5 py-0.5 rounded-full">
                 Admin
               </span>
             </div>
@@ -105,8 +117,8 @@ export default function SellerHeader() {
                   href={href}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
                     ${active
-                      ? 'bg-amber-600/20 text-amber-400 border border-amber-600/20'
-                      : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800'
+                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                      : 'text-stone-500 hover:bg-amber-100 hover:text-stone-800'
                     }`}
                 >
                   {icon}
@@ -120,8 +132,8 @@ export default function SellerHeader() {
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-stone-400
-                hover:bg-stone-800 hover:text-stone-200 transition-colors border border-stone-800"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-stone-500
+                hover:bg-amber-100 hover:text-stone-800 transition-colors border border-stone-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -132,17 +144,18 @@ export default function SellerHeader() {
             {/* Admin dropdown */}
             <div className="relative">
               <button
-                onClick={() => setDropdownOpen(o => !o)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-stone-800 transition-colors"
+                onClick={() => dropdownOpen ? closeDropdown() : setDropdownOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-amber-100 transition-colors duration-150"
               >
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-600 to-amber-400 flex items-center justify-center text-white text-[10px] font-bold">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-700 to-amber-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                   {adminName.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:block text-xs font-medium text-stone-300 max-w-[80px] truncate">
+                <span className="hidden sm:block text-sm font-medium text-stone-700 max-w-[80px] truncate">
                   {adminName}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg"
-                  className={`w-3 h-3 text-stone-500 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  className="w-3.5 h-3.5 text-stone-400 transition-transform duration-300"
+                  style={{ transform: dropdownVisible ? 'rotate(180deg)' : 'rotate(0deg)' }}
                   fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -150,70 +163,114 @@ export default function SellerHeader() {
 
               {dropdownOpen && (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)} />
-                  <div className="absolute right-0 top-10 w-44 bg-stone-900 border border-stone-700 rounded-xl shadow-xl z-50 py-1.5 overflow-hidden"
-                    style={{ animation: 'dropIn 150ms ease forwards' }}>
-                    <div className="px-3 py-2 border-b border-stone-800">
-                      <p className="text-xs font-semibold text-stone-200">{adminName}</p>
-                      <p className="text-[10px] text-amber-600 uppercase tracking-widest">Administrator</p>
+                  <div className="fixed inset-0 z-40" onClick={closeDropdown} />
+                  <div
+                    className="absolute right-0 top-12 w-52 bg-white rounded-2xl border border-stone-100 shadow-xl shadow-stone-900/10 py-2 z-50 overflow-hidden"
+                    style={{
+                      opacity: dropdownVisible ? 1 : 0,
+                      transform: dropdownVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.96)',
+                      transition: 'opacity 150ms ease, transform 150ms ease',
+                      transformOrigin: 'top right',
+                    }}
+                  >
+                    <div className="px-4 py-2.5 border-b border-stone-100">
+                      <p className="text-sm font-semibold text-stone-800">{adminName}</p>
+                      <p className="text-[10px] text-amber-700 uppercase tracking-widest mt-0.5">Administrator</p>
                     </div>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 w-full px-3 py-2.5 text-xs text-red-400 hover:bg-red-950/40 transition-colors mt-1"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+
+                    <Link href="/" onClick={closeDropdown}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-stone-900 transition-colors"
+                      style={{
+                        opacity: dropdownVisible ? 1 : 0,
+                        transform: dropdownVisible ? 'translateX(0)' : 'translateX(-6px)',
+                        transition: 'opacity 200ms ease 80ms, transform 200ms ease 80ms',
+                      }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
-                      Sign Out
-                    </button>
+                      View Store
+                    </Link>
+
+                    <div className="border-t border-stone-100 mt-1 pt-1"
+                      style={{
+                        opacity: dropdownVisible ? 1 : 0,
+                        transform: dropdownVisible ? 'translateX(0)' : 'translateX(-6px)',
+                        transition: 'opacity 200ms ease 120ms, transform 200ms ease 120ms',
+                      }}>
+                      <button onClick={handleLogout}
+                        className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
                 </>
               )}
             </div>
 
-            {/* Mobile hamburger */}
-            <button
-              onClick={() => setMobileOpen(o => !o)}
-              className="md:hidden p-1.5 rounded-lg text-stone-400 hover:bg-stone-800 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d={mobileOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
-              </svg>
-            </button>
+            {/* Mobile burger — same pattern as customer Burger.tsx */}
+            <div className="md:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(o => !o)}
+                className="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 text-stone-700 transition-colors duration-150"
+                aria-label="Toggle menu"
+                aria-expanded={mobileOpen}
+              >
+                {mobileOpen ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <Image src="/Burger.svg" alt="Menu" width={25} height={25} />
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Nav */}
-        {mobileOpen && (
-          <nav className="md:hidden border-t border-stone-800 py-2 flex flex-col gap-1">
-            {navItems.map(({ href, label, icon }) => {
-              const active = pathname === href
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                    ${active
-                      ? 'bg-amber-600/20 text-amber-400'
-                      : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800'
-                    }`}
-                >
-                  {icon}
-                  {label}
-                </Link>
-              )
-            })}
-          </nav>
-        )}
-      </div>
+        {/* Mobile dropdown — nav items aligned right, same animation as Burger.tsx */}
+        <div
+          className={`md:hidden absolute top-16 left-0 right-0 border-t border-amber-100 bg-amber-50 px-4 pb-4 pt-2 space-y-1 shadow-md z-50
+            transition-all duration-300 ease-in-out origin-top
+            ${mobileOpen
+              ? 'opacity-100 scale-y-100 translate-y-0 pointer-events-auto'
+              : 'opacity-0 scale-y-95 -translate-y-2 pointer-events-none'
+            }`}
+        >
+          {navItems.map(({ href, label }, i) => {
+            const active = pathname === href
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center justify-end gap-2 text-right px-4 py-2.5 rounded-xl text-sm font-medium
+                  hover:bg-amber-100 hover:text-stone-900 transition-all duration-200
+                  ${active ? 'bg-amber-100 text-amber-800' : 'text-stone-700'}
+                  ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'}`}
+                style={{ transitionDelay: mobileOpen ? `${i * 50}ms` : '0ms' }}
+              >
+                {label}
+              </Link>
+            )
+          })}
 
-      <style jsx>{`
-        @keyframes dropIn {
-          from { opacity: 0; transform: translateY(-6px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
+          {/* View Store in mobile menu */}
+          <Link
+            href="/"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center justify-end gap-2 text-right px-4 py-2.5 rounded-xl text-sm font-medium text-stone-500
+              hover:bg-amber-100 hover:text-stone-900 transition-all duration-200 border-t border-amber-100 mt-1 pt-3
+              ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'}`}
+            style={{ transitionDelay: mobileOpen ? `${navItems.length * 50}ms` : '0ms' }}
+          >
+            View Store
+          </Link>
+        </div>
+      </div>
     </header>
   )
 }
