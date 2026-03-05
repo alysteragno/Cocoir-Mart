@@ -49,17 +49,17 @@ export default function AdminDashboard() {
   }, [])
 
   const statCards = [
-    { label: 'Total Products', value: stats.totalProducts, icon: '📦', href: '/admin/products', color: 'from-amber-500/20 to-amber-600/5 border-amber-500/20', text: 'text-amber-400' },
-    { label: 'Total Users',    value: stats.totalUsers,    icon: '👥', href: '/admin/users',    color: 'from-blue-500/20 to-blue-600/5 border-blue-500/20',   text: 'text-blue-400' },
-    { label: 'Total Orders',   value: stats.totalOrders,   icon: '🛒', href: '/admin/orders',   color: 'from-green-500/20 to-green-600/5 border-green-500/20', text: 'text-green-400' },
-    { label: 'Total Revenue',  value: `₱${stats.totalRevenue.toLocaleString('en-PH')}`, icon: '💰', href: '/admin/reports', color: 'from-purple-500/20 to-purple-600/5 border-purple-500/20', text: 'text-purple-400' },
+    { label: 'Total Products', value: stats.totalProducts, icon: '📦', href: '/seller/products', color: 'from-amber-500/20 to-amber-600/5 border-amber-500/20', text: 'text-amber-400' },
+    { label: 'Total Users',    value: stats.totalUsers,    icon: '👥', href: '/seller/users',    color: 'from-blue-500/20 to-blue-600/5 border-blue-500/20',   text: 'text-blue-400' },
+    { label: 'Total Orders',   value: stats.totalOrders,   icon: '🛒', href: '/seller/orders',   color: 'from-green-500/20 to-green-600/5 border-green-500/20', text: 'text-green-400' },
+    { label: 'Total Revenue',  value: `₱${stats.totalRevenue.toLocaleString('en-PH')}`, icon: '💰', href: '/seller/reports', color: 'from-purple-500/20 to-purple-600/5 border-purple-500/20', text: 'text-purple-400' },
   ]
 
   const quickActions = [
-    { label: 'Add Product',  href: '/admin/products/new', icon: '➕' },
-    { label: 'View Orders',  href: '/admin/orders',       icon: '📋' },
-    { label: 'Manage Users', href: '/admin/users',        icon: '👤' },
-    { label: 'View Reports', href: '/admin/reports',      icon: '📊' },
+    { label: 'Add Product',  href: '/seller/products/new', icon: '➕' },
+    { label: 'View Orders',  href: '/seller/orders',       icon: '📋' },
+    { label: 'Manage Users', href: '/seller/users',        icon: '👤' },
+    { label: 'View Reports', href: '/seller/reports',      icon: '📊' },
   ]
 
   return (
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xs font-bold uppercase tracking-[3px] text-stone-500">Recent Users</h2>
-          <Link href="/admin/users" className="text-xs text-amber-600 hover:text-amber-500 transition-colors">
+          <Link href="/seller/users" className="text-xs text-amber-600 hover:text-amber-500 transition-colors">
             View all →
           </Link>
         </div>
@@ -178,6 +178,12 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   )
 }
