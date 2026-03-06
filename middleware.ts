@@ -20,77 +20,61 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // ── Protect /seller routes ──
-  if (pathname.startsWith("/seller")) {
-    if (!user) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
-    }
-
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "admin") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
-
-  if (pathname === "/") {
+  // ── Fetch role once — reused for all checks below ──
+  let role: string | null = null
   if (user) {
     const { data: profile } = await supabase
       .from("users")
       .select("role")
       .eq("id", user.id)
       .single();
-
-    if (profile?.role === "admin") {
-      return NextResponse.redirect(new URL("/seller/dashboard", request.url));
-    }
+    role = profile?.role ?? null
   }
-}
 
-  if (pathname.startsWith("/cart") || pathname.startsWith("/checkout")) {
-    if (user) {
-      const { data: profile } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+  const isAdmin = role === "admin"
+  const isLoggedIn = !!user
 
-      if (profile?.role === "admin") {
-        return NextResponse.redirect(new URL("/seller/dashboard", request.url));
-      }
+  // ── /seller → must be logged in + admin ──
+  if (pathname.startsWith("/seller")) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
-  // ── Protect customer-only routes ──
+  // ── / → admin gets redirected to seller dashboard ──
+  if (pathname === "/" && isAdmin) {
+    return NextResponse.redirect(new URL("/seller/dashboard", request.url));
+  }
+
+  // ── Customer routes → admin gets redirected to seller dashboard ──
   if (
+    pathname.startsWith("/products") ||
     pathname.startsWith("/orders") ||
     pathname.startsWith("/cart") ||
     pathname.startsWith("/checkout") ||
     pathname.startsWith("/profile")
   ) {
-    if (!user) {
+    if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/seller/dashboard", request.url));
     }
   }
 
   return response;
-
-  
 }
-
 
 export const config = {
   matcher: [
     "/",
     "/seller/:path*",
+    "/products/:path*",
     "/orders/:path*",
     "/cart/:path*",
     "/checkout/:path*",
