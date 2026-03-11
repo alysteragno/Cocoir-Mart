@@ -51,20 +51,6 @@ export default function Header() {
           {/* Right Actions */}
           <div className="flex items-center gap-2">
 
-            {/* Cart */}
-            <Link
-              href="/cart"
-              className="relative flex items-center justify-center w-9 h-9 rounded-xl hover:bg-amber-100 text-stone-600 hover:text-stone-900 transition-colors duration-150"
-              aria-label="View cart"
-            >
-              <Icon src="/cart.svg" alt="Cart" width={25} height={25} />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                2
-              </span>
-            </Link>
-
-            {/* Divider */}
-
             {/* Auth — shows login/register OR avatar+dropdown based on session */}
             <UserMenu />
 
