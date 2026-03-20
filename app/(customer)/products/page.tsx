@@ -22,6 +22,8 @@ export default function CustomerProductsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
+  const [addingId, setAddingId] = useState<string | null>(null)
+  const [addedId, setAddedId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -36,6 +38,44 @@ export default function CustomerProductsPage() {
     }
     fetchProducts()
   }, [])
+
+  const handleAddToCart = async (e: React.MouseEvent, product: Product) => {
+    e.preventDefault() // prevent navigating to product page
+    setAddingId(product.id)
+
+    const supabase = supabaseBrowser()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      window.location.href = '/auth/login'
+      return
+    }
+
+    // Check if already in cart
+    const { data: existing } = await supabase
+      .from('cart_items')
+      .select('id, quantity')
+      .eq('user_id', user.id)
+      .eq('product_id', product.id)
+      .maybeSingle()
+
+    if (existing) {
+      // Increment quantity
+      await supabase
+        .from('cart_items')
+        .update({ quantity: existing.quantity + 1 })
+        .eq('id', existing.id)
+    } else {
+      // Insert new cart item
+      await supabase
+        .from('cart_items')
+        .insert({ user_id: user.id, product_id: product.id, quantity: 1 })
+    }
+
+    setAddingId(null)
+    setAddedId(product.id)
+    setTimeout(() => setAddedId(null), 2000)
+  }
 
   const filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase())
@@ -57,7 +97,6 @@ export default function CustomerProductsPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Search */}
         <div className="relative flex-1">
           <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -71,19 +110,14 @@ export default function CustomerProductsPage() {
               placeholder:text-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/15 transition-all"
           />
         </div>
-
-        {/* Category pills */}
         <div className="flex items-center gap-2 flex-wrap">
           {categories.map(c => (
-            <button
-              key={c}
-              onClick={() => setCategory(c)}
+            <button key={c} onClick={() => setCategory(c)}
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150
                 ${category === c
                   ? 'bg-stone-800 text-amber-50'
                   : 'bg-white border border-stone-200 text-stone-600 hover:border-amber-300 hover:text-stone-800'
-                }`}
-            >
+                }`}>
               {c}
             </button>
           ))}
@@ -104,10 +138,8 @@ export default function CustomerProductsPage() {
             {search || category !== 'All' ? 'No products match your filters' : 'No products available yet'}
           </p>
           {(search || category !== 'All') && (
-            <button
-              onClick={() => { setSearch(''); setCategory('All') }}
-              className="mt-4 text-sm text-amber-700 hover:underline font-medium"
-            >
+            <button onClick={() => { setSearch(''); setCategory('All') }}
+              className="mt-4 text-sm text-amber-700 hover:underline font-medium">
               Clear filters
             </button>
           )}
@@ -126,12 +158,8 @@ export default function CustomerProductsPage() {
                 {/* Image */}
                 <div className="relative aspect-square bg-stone-100 overflow-hidden">
                   {product.image_url ? (
-                    <Image
-                      src={product.image_url}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <Image src={product.image_url} alt={product.name} fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-4xl">📦</div>
                   )}
@@ -143,7 +171,7 @@ export default function CustomerProductsPage() {
                         ⭐ Featured
                       </span>
                     )}
-                    {product.stock <= 10 && product.stock > 0 && (
+                    {product.stock <= 10 && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500 text-white shadow-sm">
                         Only {product.stock} left
                       </span>
@@ -164,7 +192,7 @@ export default function CustomerProductsPage() {
                   {product.description && (
                     <p className="text-xs text-stone-400 mt-1 line-clamp-2">{product.description}</p>
                   )}
-                  <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center justify-between mt-2 mb-3">
                     <p className="text-base font-bold text-stone-800">
                       ₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
                     </p>
@@ -172,6 +200,34 @@ export default function CustomerProductsPage() {
                       {product.stock} in stock
                     </span>
                   </div>
+
+                  {/* Add to Cart button */}
+                  <button
+                    onClick={e => handleAddToCart(e, product)}
+                    disabled={addingId === product.id}
+                    className={`w-full py-2 rounded-xl text-xs font-semibold transition-all duration-200
+                      ${addedId === product.id
+                        ? 'bg-green-500 text-white'
+                        : 'bg-stone-800 hover:bg-amber-700 text-amber-50 hover:-translate-y-0.5 hover:shadow-md'
+                      } disabled:opacity-60 disabled:cursor-not-allowed`}
+                  >
+                    {addingId === product.id ? (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                        Adding…
+                      </span>
+                    ) : addedId === product.id ? (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Added!
+                      </span>
+                    ) : 'Add to Cart'}
+                  </button>
                 </div>
               </Link>
             ))}
