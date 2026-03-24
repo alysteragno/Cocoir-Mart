@@ -43,11 +43,20 @@ const navItems = [
     ),
   },
   {
-    href: '/seller/reports',
-    label: 'Reports',
+    href: '/seller/reports/inventory',
+    label: 'Inventory',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/seller/reports/sales',
+    label: 'Sales',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
       </svg>
     ),
   },
@@ -130,17 +139,6 @@ export default function SellerHeader() {
 
           {/* Right */}
           <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/products"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-stone-500
-                hover:bg-amber-100 hover:text-stone-800 transition-colors border border-stone-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              View Store
-            </Link>
-
             {/* Admin dropdown */}
             <div className="relative">
               <button
@@ -210,7 +208,7 @@ export default function SellerHeader() {
               )}
             </div>
 
-            {/* Mobile burger — same pattern as customer Burger.tsx */}
+            {/* Mobile burger */}
             <div className="md:hidden">
               <button
                 type="button"
@@ -231,7 +229,7 @@ export default function SellerHeader() {
           </div>
         </div>
 
-        {/* Mobile dropdown — nav items aligned right, same animation as Burger.tsx */}
+        {/* Mobile dropdown */}
         <div
           className={`md:hidden absolute top-16 left-0 right-0 border-t border-amber-100 bg-amber-50 px-4 pb-4 pt-2 space-y-1 shadow-md z-50
             transition-all duration-300 ease-in-out origin-top
@@ -257,18 +255,6 @@ export default function SellerHeader() {
               </Link>
             )
           })}
-
-          {/* View Store in mobile menu */}
-          <Link
-            href="/products"
-            onClick={() => setMobileOpen(false)}
-            className={`flex items-center justify-end gap-2 text-right px-4 py-2.5 rounded-xl text-sm font-medium text-stone-500
-              hover:bg-amber-100 hover:text-stone-900 transition-all duration-200 border-t border-amber-100 mt-1 pt-3
-              ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'}`}
-            style={{ transitionDelay: mobileOpen ? `${navItems.length * 50}ms` : '0ms' }}
-          >
-            View Store
-          </Link>
         </div>
       </div>
     </header>

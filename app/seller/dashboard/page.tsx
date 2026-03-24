@@ -48,14 +48,14 @@ export default function AdminDashboard() {
     { label: 'Total Products', value: stats.totalProducts, icon: '📦', href: '/seller/products', bg: 'bg-amber-50 border-amber-200', text: 'text-amber-700' },
     { label: 'Total Users',    value: stats.totalUsers,    icon: '👥', href: '/seller/users',    bg: 'bg-blue-50 border-blue-200',   text: 'text-blue-700' },
     { label: 'Total Orders',   value: stats.totalOrders,   icon: '🛒', href: '/seller/orders',   bg: 'bg-green-50 border-green-200', text: 'text-green-700' },
-    { label: 'Total Revenue',  value: `₱${stats.totalRevenue.toLocaleString('en-PH')}`, icon: '💰', href: '/seller/reports', bg: 'bg-stone-50 border-stone-200', text: 'text-stone-700' },
+    { label: 'Total Revenue',  value: `₱${stats.totalRevenue.toLocaleString('en-PH')}`, icon: '💰', href: '/seller/reports/inventory', bg: 'bg-stone-50 border-stone-200', text: 'text-stone-700' },
   ]
 
   const quickActions = [
     { label: 'Add Product',  href: '/seller/products/new', icon: '➕' },
     { label: 'View Orders',  href: '/seller/orders',       icon: '📋' },
     { label: 'Manage Users', href: '/seller/users',        icon: '👤' },
-    { label: 'View Reports', href: '/seller/reports',      icon: '📊' },
+    { label: 'View Reports', href: '/seller/reports/inventory',      icon: '📊' },
   ]
 
   return (
