@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // ── Fetch role once — reused for all checks below ──
+  // ── Fetch role once ──
   let role: string | null = null
   if (user) {
     const { data: profile } = await supabase
@@ -38,33 +38,29 @@ export async function middleware(request: NextRequest) {
 
   // ── /seller → must be logged in + admin ──
   if (pathname.startsWith("/seller")) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
-    }
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+    if (!isLoggedIn) return NextResponse.redirect(new URL("/auth/login", request.url));
+    if (!isAdmin) return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // ── / → admin gets redirected to seller dashboard ──
+  // ── / → admin goes to seller dashboard ──
   if (pathname === "/" && isAdmin) {
     return NextResponse.redirect(new URL("/seller/dashboard", request.url));
   }
 
-  // ── Customer routes → admin gets redirected to seller dashboard ──
+  // ── /products → public, but admin gets redirected ──
+  if (pathname.startsWith("/products")) {
+    if (isAdmin) return NextResponse.redirect(new URL("/seller/dashboard", request.url));
+  }
+
+  // ── Protected customer routes → must be logged in, admin blocked ──
   if (
-    pathname.startsWith("/products") ||
     pathname.startsWith("/orders") ||
     pathname.startsWith("/cart") ||
     pathname.startsWith("/checkout") ||
     pathname.startsWith("/profile")
   ) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
-    }
-    if (isAdmin) {
-      return NextResponse.redirect(new URL("/seller/dashboard", request.url));
-    }
+    if (!isLoggedIn) return NextResponse.redirect(new URL("/auth/login", request.url));
+    if (isAdmin) return NextResponse.redirect(new URL("/seller/dashboard", request.url));
   }
 
   return response;
